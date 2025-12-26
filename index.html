@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习资料储存系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    
+    .header {
+      background: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+    
+    .search-box {
+      flex: 1;
+      max-width: 500px;
+      min-width: 200px;
+      position: relative;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 12px 20px 12px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+    }
+    
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #666;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .btn-danger {
+      background: #ff4757;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #ff3344;
+    }
+    
+    .main-container {
+      display: flex;
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 0 20px;
+      gap: 20px;
+    }
+    
+    .sidebar {
+      width: 260px;
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .category-list {
+      list-style: none;
+    }
+    
+    .category-item {
+      padding: 12px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 5px;
+      transition: all 0.3s;
+    }
+    
+    .category-item:hover {
+      background: #f8f9ff;
+    }
+    
+    .category-item.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .category-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .category-item:not(.active) .category-icon {
+      background: #f0f0f0;
+    }
+    
+    .category-name {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    .category-count {
+      background: #f0f0f0;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .category-item.active .category-count {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+    
+    .content {
+      flex: 1;
+    }
+    
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card h3 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    
+    .stat-card p {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .content-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 20px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .filter-tab.active {
+      background: white;
+      color: #667eea;
+    }
+    
+    .materials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .material-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .material-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .material-preview {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .material-info {
+      padding: 15px;
+    }
+    
+    .material-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .material-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+    
+    .material-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    
+    .tag {
+      padding: 3px 10px;
+      background: #f0f0f0;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .material-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    .action-btn.download {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .action-btn.delete {
+      background: #ff4757;
+      color: white;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .modal-close {
+      width: 35px;
+      height: 35px;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+    
+    .modal-close:hover {
+      background: #e0e0e0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .file-upload-area {
+      border: 2px dashed #667eea;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-upload-area:hover {
+      background: #f8f9ff;
+    }
+    
+    .file-upload-area.dragover {
+      background: #f0f0ff;
+      border-color: #764ba2;
+    }
+    
+    .upload-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    
+    .upload-text {
+      color: #888;
+      font-size: 14px;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+    
+    .modal-footer .btn {
+      flex: 1;
+    }
+    
+    .detail-modal .modal {
+      max-width: 700px;
+    }
+    
+    .detail-preview {
+      height: 200px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    
+    .detail-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .detail-item {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .detail-item label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+    
+    .detail-item span {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .detail-description {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .detail-description label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+    }
+    
+    .detail-description p {
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+    
+    .empty-state-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+      opacity: 0.8;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 15px 25px;
+      background: #333;
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 2000;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background: #2ed573;
+    }
+    
+    .toast.error {
+      background: #ff4757;
+    }
+    
+    .notice-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .notice-banner .icon {
+      font-size: 20px;
+    }
+    
+    @media (max-width: 1024px) {
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .sidebar {
+        width: 220px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        position: static;
+      }
+      
+      .category-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .category-item {
+        flex: 1;
+        min-width: 140px;
+      }
+      
+      .stats-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">📚</div>
+      <span>学习资料储存系统</span>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索资料...">
+    </div>
+    <div class="user-area">
+      <button class="btn btn-primary" id="uploadBtn" style="display: none;">上传资料</button>
+      <button class="btn btn-secondary" id="loginBtn">管理员登录</button>
+      <button class="btn btn-secondary" id="logoutBtn" style="display: none;">退出登录</button>
+    </div>
+  </header>
+  
+  <div class="main-container">
+    <aside class="sidebar">
+      <h3 class="sidebar-title">资料分类</h3>
+      <ul class="category-list" id="categoryList">
+      </ul>
+    </aside>
+    
+    <main class="content">
+      <div class="notice-banner">
+        <span class="icon">ℹ️</span>
+        <span>静态版本 - 数据保存在浏览器本地存储中</span>
+      </div>
+      
+      <div class="stats-bar" id="statsBar">
+      </div>
+      
+      <div class="content-header">
+        <h2 class="content-title" id="contentTitle">全部资料</h2>
+      </div>
+      
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" data-filter="all">全部</button>
+        <button class="filter-tab" data-filter="document">文档</button>
+        <button class="filter-tab" data-filter="image">图片</button>
+        <button class="filter-tab" data-filter="code">代码</button>
+      </div>
+      
+      <div class="materials-grid" id="materialsGrid">
+      </div>
+      
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state-icon">📂</div>
+        <h3>暂无资料</h3>
+        <p>点击上方上传按钮开始添加学习资料</p>
+      </div>
+    </main>
+  </div>
+  
+  <div class="modal-overlay upload-modal" id="uploadModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">上传资料</h3>
+        <button class="modal-close" onclick="closeModal('uploadModal')">×</button>
+      </div>
+      <form id="uploadForm">
+        <div class="form-group">
+          <label>资料标题 *</label>
+          <input type="text" id="materialTitle" required placeholder="请输入资料名称">
+        </div>
+        <div class="form-group">
+          <label>分类 *</label>
+          <select id="materialCategory" required>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>学期（选填）</label>
+          <select id="materialSemester">
+            <option value="">请选择学期</option>
+            <option value="2024-2025-1">2024-2025学年第一学期</option>
+            <option value="2024-2025-2">2025-2026学年第二学期</option>
+            <option value="2023-2024-1">2026-2027学年第一学期</option>
+            <option value="2023-2024-2">2027-2028学年第二学期</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>版本（选填）</label>
+          <input type="text" id="materialVersion" placeholder="如：V1.0">
+        </div>
+        <div class="form-group">
+          <label>标签（逗号分隔）</label>
+          <input type="text" id="materialTags" placeholder="如：微信小程序,前端开发">
+        </div>
+        <div class="form-group">
+          <label>描述</label>
+          <textarea id="materialDescription" placeholder="请输入资料描述"></textarea>
+        </div>
+        <div class="form-group">
+          <label>备注（选填）</label>
+          <input type="text" id="materialNotes" placeholder="如：网盘链接、密码等">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('uploadModal')">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="modal-overlay detail-modal" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">资料详情</h3>
+        <button class="modal-close" onclick="closeModal('detailModal')">×</button>
+      </div>
+      <div id="detailContent">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('detailModal')">关闭</button>
+        <button class="btn btn-danger" id="detailDeleteBtn" style="display: none;">删除</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">管理员登录</h3>
+        <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>用户名</label>
+          <input type="text" id="loginUsername" required placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="loginPassword" required placeholder="请输入密码">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('loginModal')">取消</button>
+          <button type="submit" class="btn btn-primary">登录</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    const STORAGE_KEY = 'learning_materials_data';
+    const CATEGORIES_KEY = 'learning_materials_categories';
+    
+    let currentCategory = null;
+    let currentFilter = 'all';
+    let materials = [];
+    let categories = [];
+    let isAdmin = false;
+    
+    const ADMIN_USERNAME = 'admin';
+    const ADMIN_PASSWORD = 'admin123456';
+    const STORAGE_KEY = 'learning_materials_data';
+    const CATEGORIES_KEY = 'learning_materials_categories';
+    const LOGIN_KEY = 'learning_materials_admin';
+    
+    const defaultCategories = [
+      { id: 1, name: '课程资料', type: 'course', description: '课件 PPT、课后习题、课堂笔记、考试复习提纲', icon: 'book' },
+      { id: 2, name: '编程资源', type: 'code', description: '代码片段、开源项目源码、技术文档、工具安装包', icon: 'code' },
+      { id: 3, name: '项目文档', type: 'project', description: '需求文档、设计稿、测试报告、复盘笔记', icon: 'folder' },
+      { id: 4, name: '竞赛素材', type: 'competition', description: '竞赛相关的资料和作品', icon: 'trophy' },
+      { id: 5, name: '民族文化', type: 'culture', description: '藏语学习资料与民族文化素材', icon: 'globe' }
+    ];
+    
+    function init() {
+      loadData();
+      checkAdminStatus();
+      renderCategories();
+      renderStats();
+      renderMaterials();
+      setupEventListeners();
+    }
+    
+    function checkAdminStatus() {
+      const savedAdmin = localStorage.getItem(LOGIN_KEY);
+      if (savedAdmin === 'true') {
+        isAdmin = true;
+        updateAdminUI();
+      }
+    }
+    
+    function updateAdminUI() {
+      const loginBtn = document.getElementById('loginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const deleteBtns = document.querySelectorAll('.action-btn.delete');
+      
+      if (isAdmin) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = 'block';
+        uploadBtn.style.display = 'block';
+        deleteBtns.forEach(btn => btn.style.display = 'block');
+      } else {
+        loginBtn.style.display = 'block';
+        logoutBtn.style.display = 'none';
+        uploadBtn.style.display = 'none';
+        deleteBtns.forEach(btn => btn.style.display = 'none');
+      }
+    }
+    
+    function loadData() {
+      const savedCategories = localStorage.getItem(CATEGORIES_KEY);
+      if (savedCategories) {
+        categories = JSON.parse(savedCategories);
+      } else {
+        categories = [...defaultCategories];
+        localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
+      }
+      
+      const savedMaterials = localStorage.getItem(STORAGE_KEY);
+      if (savedMaterials) {
+        materials = JSON.parse(savedMaterials);
+      } else {
+        materials = [];
+      }
+    }
+    
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(materials));
+    }
+    
+    function renderCategories() {
+      const list = document.getElementById('categoryList');
+      list.innerHTML = `
+        <li class="category-item ${currentCategory === null ? 'active' : ''}" data-id="0">
+          <div class="category-icon">📁</div>
+          <span class="category-name">全部资料</span>
+          <span class="category-count">${materials.length}</span>
+        </li>
+      ` + categories.map(cat => {
+        const count = materials.filter(m => m.category_id === cat.id).length;
+        return `
+          <li class="category-item ${currentCategory === cat.id ? 'active' : ''}" data-id="${cat.id}">
+            <div class="category-icon">${getCategoryIcon(cat.icon)}</div>
+            <span class="category-name">${cat.name}</span>
+            <span class="category-count">${count}</span>
+          </li>
+        `;
+      }).join('');
+      
+      list.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const id = item.dataset.id;
+          currentCategory = id === '0' ? null : parseInt(id);
+          renderCategories();
+          renderMaterials();
+          updateContentTitle();
+        });
+      });
+      
+      renderCategorySelect();
+    }
+    
+    function renderCategorySelect() {
+      const select = document.getElementById('materialCategory');
+      select.innerHTML = categories.map(cat => 
+        `<option value="${cat.id}">${cat.name}</option>`
+      ).join('');
+    }
+    
+    function getCategoryIcon(icon) {
+      const icons = {
+        'book': '📚',
+        'code': '💻',
+        'folder': '📂',
+        'trophy': '🏆',
+        'globe': '🌍',
+        'image': '🖼️',
+        'document': '📄'
+      };
+      return icons[icon] || '📁';
+    }
+    
+    function getFileIcon(type) {
+      const icons = {
+        'PDF': '📕',
+        'Word': '📘',
+        'PPT': '📊',
+        'Markdown': '📝',
+        '文本': '📄',
+        'Excel': '📈',
+        '图片': '🖼️',
+        'Python': '🐍',
+        'JavaScript': '📜',
+        'Java': '☕',
+        'C++': '⚙️',
+        'C': '⚙️',
+        'HTML': '🌐',
+        'CSS': '🎨',
+        'JSON': '📋',
+        '微信小程序': '📱',
+        '压缩包': '📦',
+        '程序': '⚡',
+        '安装包': '📲',
+        '其他': '📎'
+      };
+      return icons[type] || '📎';
+    }
+    
+    function renderStats() {
+      const statsBar = document.getElementById('statsBar');
+      statsBar.innerHTML = `
+        <div class="stat-card">
+          <h3>${materials.length}</h3>
+          <p>资料总数</p>
+        </div>
+        <div class="stat-card">
+          <h3>${categories.length}</h3>
+          <p>分类数量</p>
+        </div>
+        <div class="stat-card">
+          <h3>${new Set(materials.map(m => m.semester).filter(Boolean)).size}</h3>
+          <p>学期数量</p>
+        </div>
+        <div class="stat-card">
+          <h3>${new Set(materials.flatMap(m => (m.tags || '').split(',').filter(Boolean))).size}</h3>
+          <p>标签种类</p>
+        </div>
+      `;
+    }
+    
+    function renderMaterials() {
+      let filtered = materials;
+      
+      if (currentCategory !== null) {
+        filtered = materials.filter(m => m.category_id === currentCategory);
+      }
+      
+      if (currentFilter !== 'all') {
+        const filterTypes = {
+          'document': ['PDF', 'Word', 'PPT', 'Markdown', '文本', 'Excel'],
+          'image': ['图片'],
+          'code': ['Python', 'JavaScript', 'Java', 'C++', 'C', 'HTML', 'CSS', 'JSON', '微信小程序']
+        };
+        filtered = filtered.filter(m => filterTypes[currentFilter]?.includes(m.file_type));
+      }
+      
+      const grid = document.getElementById('materialsGrid');
+      const empty = document.getElementById('emptyState');
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      
+      empty.style.display = 'none';
+      
+      const sorted = [...filtered].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      grid.innerHTML = sorted.map(m => {
+        const category = categories.find(c => c.id === m.category_id);
+        return `
+          <div class="material-card" data-id="${m.id}">
+            <div class="material-preview">${getFileIcon(m.file_type || '其他')}</div>
+            <div class="material-info">
+              <h4 class="material-title">${m.title}</h4>
+              <div class="material-meta">
+                <span>${category?.name || '未分类'}</span>
+                <span>${m.file_type || '其他'}</span>
+              </div>
+              <div class="material-tags">
+                ${m.tags ? m.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : ''}
+                ${m.semester ? `<span class="tag">${formatSemester(m.semester)}</span>` : ''}
+              </div>
+              <div class="material-actions">
+                <button class="action-btn download" onclick="showDetail(${m.id})">查看详情</button>
+                <button class="action-btn delete" onclick="deleteMaterial(${m.id}, event)" style="display: none;">删除</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      grid.querySelectorAll('.material-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('action-btn')) {
+            showDetail(parseInt(card.dataset.id));
+          }
+        });
+      });
+      
+      updateAdminUI();
+    }
+    
+    function updateContentTitle() {
+      const title = currentCategory 
+        ? categories.find(c => c.id === currentCategory)?.name || '全部资料'
+        : '全部资料';
+      document.getElementById('contentTitle').textContent = title;
+    }
+    
+    function setupEventListeners() {
+      document.getElementById('uploadBtn').addEventListener('click', () => {
+        openModal('uploadModal');
+      });
+      
+      document.getElementById('filterTabs').addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-tab')) {
+          document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          currentFilter = e.target.dataset.filter;
+          renderMaterials();
+        }
+      });
+      
+      document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 300));
+      
+      document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+      
+      document.getElementById('detailDeleteBtn').addEventListener('click', () => {
+        if (confirm('确定要删除此资料吗？')) {
+          deleteMaterial(currentDetailId);
+        }
+      });
+      
+      document.getElementById('loginBtn').addEventListener('click', () => {
+        openModal('loginModal');
+      });
+      
+      document.getElementById('logoutBtn').addEventListener('click', logout);
+      
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    }
+    
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        localStorage.setItem(LOGIN_KEY, 'true');
+        updateAdminUI();
+        closeModal('loginModal');
+        document.getElementById('loginForm').reset();
+        showToast('登录成功', 'success');
+      } else {
+        showToast('用户名或密码错误', 'error');
+      }
+    }
+    
+    function logout() {
+      isAdmin = false;
+      localStorage.removeItem(LOGIN_KEY);
+      updateAdminUI();
+      showToast('已退出登录', 'success');
+    }
+    
+    function handleSearch() {
+      const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+      
+      if (!keyword) {
+        renderMaterials();
+        return;
+      }
+      
+      const filtered = materials.filter(m => 
+        m.title.toLowerCase().includes(keyword) || 
+        (m.description && m.description.toLowerCase().includes(keyword)) ||
+        (m.tags && m.tags.toLowerCase().includes(keyword))
+      );
+      
+      const grid = document.getElementById('materialsGrid');
+      const empty = document.getElementById('emptyState');
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        empty.querySelector('h3').textContent = '未找到相关结果';
+        return;
+      }
+      
+      empty.style.display = 'none';
+      
+      grid.innerHTML = filtered.map(m => {
+        const category = categories.find(c => c.id === m.category_id);
+        return `
+          <div class="material-card" data-id="${m.id}">
+            <div class="material-preview">${getFileIcon(m.file_type || '其他')}</div>
+            <div class="material-info">
+              <h4 class="material-title">${m.title}</h4>
+              <div class="material-meta">
+                <span>${category?.name || '未分类'}</span>
+                <span>${m.file_type || '其他'}</span>
+              </div>
+              <div class="material-tags">
+                ${m.tags ? m.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : ''}
+              </div>
+              <div class="material-actions">
+                <button class="action-btn download" onclick="showDetail(${m.id})">查看详情</button>
+                <button class="action-btn delete" onclick="deleteMaterial(${m.id}, event)" style="display: none;">删除</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      grid.querySelectorAll('.material-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('action-btn')) {
+            showDetail(parseInt(card.dataset.id));
+          }
+        });
+      });
+    }
+    
+    let currentDetailId = null;
+    
+    function showDetail(id) {
+      currentDetailId = id;
+      const material = materials.find(m => m.id === id);
+      
+      if (!material) return;
+      
+      const category = categories.find(c => c.id === material.category_id);
+      
+      const content = document.getElementById('detailContent');
+      content.innerHTML = `
+        <div class="detail-preview">${getFileIcon(material.file_type || '其他')}</div>
+        <h3 style="margin-bottom: 20px; font-size: 20px;">${material.title}</h3>
+        <div class="detail-info">
+          <div class="detail-item">
+            <label>分类</label>
+            <span>${category?.name || '未分类'}</span>
+          </div>
+          <div class="detail-item">
+            <label>文件类型</label>
+            <span>${material.file_type || '未指定'}</span>
+          </div>
+          <div class="detail-item">
+            <label>版本</label>
+            <span>${material.version || '无'}</span>
+          </div>
+          <div class="detail-item">
+            <label>学期</label>
+            <span>${formatSemester(material.semester) || '未指定'}</span>
+          </div>
+          <div class="detail-item">
+            <label>上传时间</label>
+            <span>${formatDate(material.created_at)}</span>
+          </div>
+          <div class="detail-item">
+            <label>标签</label>
+            <div class="material-tags" style="margin-top: 5px;">
+              ${material.tags ? material.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '<span>无</span>'}
+            </div>
+          </div>
+        </div>
+        ${material.description ? `
+          <div class="detail-description">
+            <label>描述</label>
+            <p>${material.description}</p>
+          </div>
+        ` : ''}
+        ${material.notes ? `
+          <div class="detail-description">
+            <label>备注</label>
+            <p>${material.notes}</p>
+          </div>
+        ` : ''}
+      `;
+      
+      openModal('detailModal');
+    }
+    
+    function handleUpload(e) {
+      e.preventDefault();
+      
+      const material = {
+        id: Date.now(),
+        title: document.getElementById('materialTitle').value,
+        category_id: parseInt(document.getElementById('materialCategory').value),
+        semester: document.getElementById('materialSemester').value,
+        version: document.getElementById('materialVersion').value,
+        tags: document.getElementById('materialTags').value,
+        description: document.getElementById('materialDescription').value,
+        notes: document.getElementById('materialNotes').value,
+        file_type: '其他',
+        created_at: new Date().toISOString()
+      };
+      
+      materials.push(material);
+      saveData();
+      
+      showToast('保存成功', 'success');
+      closeModal('uploadModal');
+      document.getElementById('uploadForm').reset();
+      
+      renderCategories();
+      renderStats();
+      renderMaterials();
+    }
+    
+    function deleteMaterial(id, event) {
+      if (event) event.stopPropagation();
+      
+      materials = materials.filter(m => m.id !== id);
+      saveData();
+      
+      showToast('删除成功', 'success');
+      closeModal('detailModal');
+      
+      renderCategories();
+      renderStats();
+      renderMaterials();
+    }
+    
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+    
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('zh-CN');
+    }
+    
+    function formatSemester(semester) {
+      if (!semester) return '';
+      const map = {
+        '2024-2025-1': '24-25第一学期',
+        '2024-2025-2': '24-25第二学期',
+        '2023-2024-1': '23-24第一学期',
+        '2023-2024-2': '23-24第二学期'
+      };
+      return map[semester] || semester;
+    }
+    
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
